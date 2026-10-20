@@ -9,3 +9,7 @@ class Pelicula:
         self.itinerario = data.get('itinerario')
         self.created_at = data.get('created_at')
         self.updated_at = data.get('updated_at')
+
+    @classmethod
+    def save(cls,data):
+        query = """INSERT INTO viajes (destino, fecha_fin, fecha_iniccio, itinerario, created_at, updated_at) VALUES (%(destino)s,%(fecha_fin)s,%(fecha_inicio)s,%(itinerario)s,NOW(),NOW())"""
