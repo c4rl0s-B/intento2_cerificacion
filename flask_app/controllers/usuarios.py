@@ -23,7 +23,7 @@ def crear_usuario():
         'password': pass_hasheado
     }
     nuevo_id= Usuario.save(datos_usuario_registro)
-    session['usuario.id']=nuevo_id
+    session['usuario_id'] = nuevo_id
     return redirect ('/dashboard')
 
 @app.route('/iniciar_sesion', methods=['post'])
@@ -33,7 +33,7 @@ def iniciar_session():
     if not usuario or not bcrypt.check_password_hash(usuario.password,request.form['password_inicio_sesion']):
         flash("E-email o contraseña incorrectos","inicio_sesion")
         return redirect('/')
-    session['usuario_id']= usuario.id
+    session['usuario_id'] = usuario_id
     session['nombre'] = usuario.nombre
     return redirect('/dashboard')
 

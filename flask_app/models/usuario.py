@@ -2,7 +2,7 @@ from flask_app.config.mysqlconnection import connectToMySQL
 import re
 from flask import flash
 
-EMAIL_REGEX = re.compile(r'^[a-zA-Z0_9.++_-]+^[a-zA-Z0-9._-]+,[a-zA-Z]+$')
+EMAIL_REGEX = re.compile(r'^[a-zA-Z0-9.+_-]+@[a-zA-Z0-9._-]+.[a-zA-Z]+$')
 
 class Usuario:
     def __init__(self,data):
@@ -14,58 +14,50 @@ class Usuario:
         self.created_at = data.get('created_at')
         self.updated_at = data.get('updated_at')
 
-        @classmethod
-        def save(cls, data):
-            query = "INSET INTO usuario (nombre, apellido, email, password, created_at, updated_at) VALUE (%(nombre)s,%(apellido)s,%(email)s,%(password)s,NOW(),NOW())"
-            return connectToMySQL('viajero-frecuente').query_db(query,data)
-
-        @classmethod
-        def get_all(cls):
-            query ="SELECT * FROM usuarios"
-            usuarios_en_db = connectToMySQL('viajero-frecuente').query_db(query)
-
-            usuarios = []
-            for usuarios in usuarios_en_db:
-
-                usuarios.append(cls(usuario))
-
-            return usuarios
+    @classmethod
+    def save(cls, data):
+        query = """INSERT INTO usuarios (nombre, apellido, email, password, created_at, updated_at) VALUES (%(nombre)s,%(apellido)s,%(email)s,%(password)s,NOW(),NOW())"""
+        return connectToMySQL('viajero-frecuente').query_db(query,data)
+    
+    @classmethod
+    def get_all(cls):
+        query ="SELECT * FROM usuarios"
+        usuarios_en_db = connectToMySQL('viajero-frecuente').query_db(query)
+        usuarios = []
+        for usuario in usuarios_en_db:
+            usuarios.append(cls(usuario))
+        return usuarios
+    
+    @classmethod
+    def get_by_email(cls, data):
+        query ="SELECT * FROM usuarios WHERE email=%(email)s"
+        usuario_en_db = connectToMySQL('viajero-frecuente').query_db(query, data)
+        print("USUARIO EN DB",usuario_en_db)
+        if not usuario_en_db:
+            return None
+        return cls(usuario_en_db[0])
+    
+    @staticmethod
+    def validar_registro(formulario):
+        si_valido = True
+        if len(formulario['nombre']) < 2:
+            flash("El nombre deve tener al menos 2 caracteres",'registro')
+            si_valido = False
+        if len(formulario['apellido']) < 2:
+            flash("El apellido deve tener al menos 2 caracteres",'registro')
+            si_valido = False
+        if not EMAIL_REGEX.match(formulario['email']):
+            flash("El email no tiene un formato valido",'registro')
+            si_valido = False
+        elif Usuario.get_by_email({'email':formulario['email']}):
+            print(Usuario.get_by_email({'email':formulario['email']}))
+            flash("Ya existe una cuenta registrada con este email",'registro')
+            si_valido = False
+        if len (formulario['password']) < 8:
+            flash("el password deve tener mas de 8 caracteres")
+            si_valido = False
+        if formulario.get('password','') != formulario.get('conf_password',''):
+            flash("Lass contraseñas no coinsiden",'registro')
+            si_valido = False
         
-        @classmethod
-        def get_by_email(cls, data):
-            query ="SELECT * FROM usuarios WHERE email=%(email)s"
-            usuario_en_db = connectToMySQL('viajero-frecuente').query_db(query, data)
-
-            print("USUARIO EN DB",usuario_en_db)
-            if not usuario_en_db:
-                return None
-            return cls(usuario_en_db[0])
-
-        @staticmethod
-        def validar_registro(formulario):
-            si_valido = True
-
-            if len(formulario['nombre']) < 2:
-                flash("El nombre deve tener al menos 2 caracteres",'registro')
-                si_valido = False
-
-            if len(formulario['apellido']) < 2:
-                flash("El apellido deve tener al menos 2 caracteres",'registro')
-                si_valido = False
-
-            if not EMAIL_REGEX.match(formulario['email']):
-                flash("El email no tiene un formato valido",'registro')
-                si_valido = False
-            elif Usuario.get_by_email({'email':formulario['email']}):
-                print(Usuario.get_by_email({'email':formulario['emali']}))
-                flash("Ya existe una cuenta registrada con este email",'registro')
-                si_valido = False
-
-            if len (formulario['password']) < 8:
-                flash("el password deve tener mas de 8 caracteres")
-                si_valido = False
-
-            if formulario['password'] != formulario['conf_password']:
-                flash("Lass contraseñas no coinsiden",'registro')
-                si_valido = False
-                return si_valido 
+        return si_valido 
