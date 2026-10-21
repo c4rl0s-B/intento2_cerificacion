@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>crear nuevo viaje</h1>
+    <form action="/viajes/crear" method="post">
+    {% for mensaje in get_flashed_messages(category_filter=['viaje']) %}
+        <p role="alert">{{ mensaje }}</p>
+    {% endfor %}
+        <label for="destino-nuevo">Destino:</label>
+        <input id="destino-nuevo" name="destino" type="text" maxlength="255" required>
+
+        <label for="inicio-nuevo">Fecha de inicio:</label>
+        <input id="inicio-nuevo" name="fecha_inicio" type="date" required>
+
+        <label for="fin-nuevo">Fecha de regreso:</label>
+        <input id="fin-nuevo" name="fecha_fin" type="date" required>
+
+        <label for="itinerario-nuevo">Itinerario:</label>
+        <textarea id="itinerario-nuevo" name="itinerario" required></textarea>
+        <button type="submit"> Guardar viaje</button>
+    </form>
+</body>
+</html>

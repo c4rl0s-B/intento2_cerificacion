@@ -1,0 +1,3 @@
+falta:
+--eliminar--
+--agregar viajero a un viaje--

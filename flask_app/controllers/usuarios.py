@@ -24,16 +24,17 @@ def crear_usuario():
     }
     nuevo_id= Usuario.save(datos_usuario_registro)
     session['usuario_id'] = nuevo_id
+    print("Usuario Creado", session['usuario_id'])
     return redirect ('/dashboard')
 
 @app.route('/iniciar_sesion', methods=['post'])
 def iniciar_session():
-    usuario= Usuario.get_by_email({'email': request.form['email_inicio_session']})
+    usuario= Usuario.get_by_email({'email': request.form['email_inicio_sesion']})
 
     if not usuario or not bcrypt.check_password_hash(usuario.password,request.form['password_inicio_sesion']):
         flash("E-email o contraseña incorrectos","inicio_sesion")
         return redirect('/')
-    session['usuario_id'] = usuario_id
+    session['usuario_id'] = usuario.id
     session['nombre'] = usuario.nombre
     return redirect('/dashboard')
 

@@ -61,3 +61,22 @@ class Usuario:
             si_valido = False
         
         return si_valido 
+
+    @staticmethod
+    def validar_login(formulario):
+        si_valido = True
+        if not EMAIL_REGEX.match(formulario['email_inicio_session']):
+            flash("El email no tiene un formato valido",'inicio_sesion')
+            si_valido = False
+        if len (formulario['password_inicio_sesion']) < 8:
+            flash("el password deve tener mas de 8 caracteres",'inicio_sesion')
+            si_valido = False
+        return si_valido
+
+    @classmethod
+    def get_by_id(cls,data):
+        query = "SELECT * FROM usuarios WHERE id=%(id)s"
+        usuario_en_db = connectToMySQL('viajero-frecuente').query_db(query,data)
+        if not usuario_en_db:
+            return None
+        return cls(usuario_en_db[0])
